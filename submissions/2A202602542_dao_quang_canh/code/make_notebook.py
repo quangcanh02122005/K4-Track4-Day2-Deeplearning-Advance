@@ -54,7 +54,7 @@ for name in ["labels", "train_subset0", "val_subset0", "test_subset0"]:
 !ls data | head
 ''')
 code('''
-IMAGES_DIR = "data/images"   # xem `ls data` ở ô trên; đổi nếu ảnh nằm thư mục khác
+IMAGES_DIR = "data"   # ảnh .jpg nằm thẳng trong data/ sau khi giải nén
 LABELS_DIR = "data/labels"
 COMMON = dict(images_dir=IMAGES_DIR, labels_dir=LABELS_DIR, out_dir=f"{WORK}/runs",
               pred_dir=f"{WORK}/predictions", curves_dir=f"{WORK}/curves", num_workers=2)

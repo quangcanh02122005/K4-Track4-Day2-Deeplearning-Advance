@@ -76,7 +76,7 @@ class Config:
     cache_images: bool = False
     resume: bool = True
     # --- đường dẫn ---
-    images_dir: str = "data/images"
+    images_dir: str = "data"
     labels_dir: str = "data/labels"
     out_dir: str = "runs"
     pred_dir: str = "predictions"

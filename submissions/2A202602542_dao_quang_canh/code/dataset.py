@@ -30,7 +30,7 @@ def load_split(labels_dir: str | Path, fold: int = 0):
     labels_dir = Path(labels_dir)
     dfs = [pd.read_csv(labels_dir / f"{s}_subset{fold}.csv") for s in ("train", "val", "test")]
     for name, df in zip(("train", "val", "test"), dfs):
-        missing = {"Filename", "Label", "Species"} - set(df.columns)
+        missing = {"Filename", "Label"} - set(df.columns)  # CSV chia sẵn của tác giả không có cột Species
         assert not missing, f"{name}_subset{fold}.csv thiếu cột {missing}"
     return tuple(dfs)
 
