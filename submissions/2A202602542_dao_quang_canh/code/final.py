@@ -65,7 +65,37 @@ def write_final_predictions(cfg: Config, res: int = 288) -> dict:
     return info
 
 
-def run_final(base: dict, final_overrides: dict, seeds=(0, 1, 2), res: int = 288, exp_id: str = "F01"):
+def write_baseline_predictions(cfg: Config, ckpt: str | Path, res: int = 224) -> dict:
+    """Ghi dự đoán val + test (1 view, không temperature) của một lần chạy đã train xong, từ checkpoint `ckpt`
+    (best.pt). Dùng khi lần chạy được train ở máy khác (vd mốc T00 seed 0 train ở Colab, ghi test ở Kaggle).
+    Giống hệt đường đi của train.run: cùng transform đánh giá, cùng định dạng predictions. Test mở đúng một lần."""
+    test_file = pred_path(cfg, "test")
+    if test_file.exists():
+        print(f"[{cfg.exp_id} seed{cfg.seed}] đã có {test_file.name}, KHÔNG mở test lại")
+        return {}
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = M.build_model(cfg.backbone, False, D.NUM_CLASSES, init="finetune").to(device)
+    model.load_state_dict(torch.load(ckpt, map_location=device))
+    model.eval()
+    dc = M.data_config(model)
+    _, val_df, test_df = D.load_split(cfg.labels_dir, cfg.fold)
+    tf = D.build_transforms(False, res, "basic", dc["mean"], dc["std"])
+
+    def loader(df):
+        return D.make_loader(df, cfg.images_dir, tf, 64, False, num_workers=cfg.num_workers)
+
+    vn, vy, vlog = I.predict_logits(model, loader(val_df), device)
+    ev.save_predictions(pred_path(cfg, "val"), vn, vy, I._softmax(vlog))
+    tn, ty, tlog = I.predict_logits(model, loader(test_df), device)  # test: đúng một lần
+    ev.save_predictions(test_file, tn, ty, I._softmax(tlog))
+    m = ev.compute_metrics(vy, vlog.argmax(1), I._softmax(vlog))
+    info = {"exp_id": cfg.exp_id, "seed": cfg.seed, "val_macro_f1": m["macro_f1"], "val_top1": m["top1"]}
+    print(info)
+    return info
+
+
+def run_final(base: dict, final_overrides: dict, seeds=(0, 1, 2), res: int = 288, exp_id: str = "F01",
+              baseline_seeds=None):
     """Với mỗi seed: huấn luyện cấu hình cuối (KHÔNG ghi test trong run), ghi dự đoán chung kết ở `res` + T;
     rồi chạy mốc T00 (công thức nền, 1 view 224) có ghi test. Trả về list dict tóm tắt."""
     rows = []
@@ -75,7 +105,7 @@ def run_final(base: dict, final_overrides: dict, seeds=(0, 1, 2), res: int = 288
         run(cfg)
         info = write_final_predictions(cfg, res)
         rows.append(info)
-    for seed in seeds:
+    for seed in (seeds if baseline_seeds is None else baseline_seeds):
         cfg0 = Config(**{**base, "exp_id": "T00", "seed": seed, "tag": "baseline", "save_test_predictions": True})
         run(cfg0)
     return rows
