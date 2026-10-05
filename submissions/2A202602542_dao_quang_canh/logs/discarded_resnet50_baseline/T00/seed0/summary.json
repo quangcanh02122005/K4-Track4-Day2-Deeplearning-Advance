@@ -1,0 +1,15 @@
+{
+  "exp_id": "T00",
+  "seed": 0,
+  "backbone": "resnet50",
+  "weight_tag": "timm/resnet50.a1_in1k",
+  "best_epoch": 10,
+  "val_macro_f1": 0.8092440201182292,
+  "val_top1": 0.8614681519565839,
+  "val_ece": 0.014917529217576588,
+  "train_time_per_epoch_s": 32.73809594083324,
+  "params_m": 23.526473,
+  "gmacs": 4.087154688,
+  "run_dir": "/kaggle/working/out/runs/T00/seed0",
+  "device": "cuda"
+}

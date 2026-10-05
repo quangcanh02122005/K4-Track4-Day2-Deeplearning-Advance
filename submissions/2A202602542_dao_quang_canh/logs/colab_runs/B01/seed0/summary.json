@@ -1,0 +1,15 @@
+{
+  "exp_id": "B01",
+  "seed": 0,
+  "backbone": "resnet50",
+  "weight_tag": "timm/resnet50.a1_in1k",
+  "best_epoch": 12,
+  "val_macro_f1": 0.8049347079327425,
+  "val_top1": 0.8577549271636675,
+  "val_ece": 0.017743193422418,
+  "train_time_per_epoch_s": 45.98407933474997,
+  "params_m": 23.526473,
+  "gmacs": 4.087154688,
+  "run_dir": "/content/drive/MyDrive/deepweeds_lab/runs/B01/seed0",
+  "device": "cuda"
+}

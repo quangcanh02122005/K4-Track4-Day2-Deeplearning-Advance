@@ -1,0 +1,15 @@
+{
+  "exp_id": "B04",
+  "seed": 0,
+  "backbone": "deit_small_patch16_224",
+  "weight_tag": "timm/deit_small_patch16_224.fb_in1k",
+  "best_epoch": 12,
+  "val_macro_f1": 0.94043116176957,
+  "val_top1": 0.9560125678377607,
+  "val_ece": 0.021903780272670585,
+  "train_time_per_epoch_s": 45.945206373749976,
+  "params_m": 21.669129,
+  "gmacs": 4.240838016,
+  "run_dir": "/content/drive/MyDrive/deepweeds_lab/runs/B04/seed0",
+  "device": "cuda"
+}

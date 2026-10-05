@@ -1,0 +1,15 @@
+{
+  "exp_id": "T04",
+  "seed": 0,
+  "backbone": "convnext_tiny",
+  "weight_tag": "timm/convnext_tiny.in12k_ft_in1k",
+  "best_epoch": 12,
+  "val_macro_f1": 0.9710063950628408,
+  "val_top1": 0.9780062839188803,
+  "val_ece": 0.012632968744733512,
+  "train_time_per_epoch_s": 57.444634201833196,
+  "params_m": 27.827049,
+  "gmacs": 4.454770176,
+  "run_dir": "/content/drive/MyDrive/deepweeds_lab/runs/T04/seed0",
+  "device": "cuda"
+}

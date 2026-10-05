@@ -1,0 +1,15 @@
+{
+  "exp_id": "B05",
+  "seed": 0,
+  "backbone": "swin_tiny_patch4_window7_224",
+  "weight_tag": "timm/swin_tiny_patch4_window7_224.ms_in1k",
+  "best_epoch": 11,
+  "val_macro_f1": 0.9613959337767236,
+  "val_top1": 0.971151099685804,
+  "val_ece": 0.0174922037559678,
+  "train_time_per_epoch_s": 63.7991450679167,
+  "params_m": 27.526275,
+  "gmacs": 4.489805568,
+  "run_dir": "/content/drive/MyDrive/deepweeds_lab/runs/B05/seed0",
+  "device": "cuda"
+}

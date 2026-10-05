@@ -1,0 +1,15 @@
+{
+  "exp_id": "B07",
+  "seed": 0,
+  "backbone": "mobilenetv3_large_100",
+  "weight_tag": "timm/mobilenetv3_large_100.ra_in1k",
+  "best_epoch": 11,
+  "val_macro_f1": 0.7688134526802946,
+  "val_top1": 0.8309054555841188,
+  "val_ece": 0.038675873118049764,
+  "train_time_per_epoch_s": 39.088987776749796,
+  "params_m": 4.213561,
+  "gmacs": 0.21532128,
+  "run_dir": "/content/drive/MyDrive/deepweeds_lab/runs/B07/seed0",
+  "device": "cuda"
+}

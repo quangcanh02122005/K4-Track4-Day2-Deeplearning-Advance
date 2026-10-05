@@ -1,0 +1,15 @@
+{
+  "exp_id": "T00",
+  "seed": 2,
+  "backbone": "convnext_tiny",
+  "weight_tag": "timm/convnext_tiny.in12k_ft_in1k",
+  "best_epoch": 10,
+  "val_macro_f1": 0.9667793388009124,
+  "val_top1": 0.9748643244787204,
+  "val_ece": 0.017962422182663796,
+  "train_time_per_epoch_s": 49.70494194683325,
+  "params_m": 27.827049,
+  "gmacs": 4.454770176,
+  "run_dir": "/kaggle/working/out/runs/T00/seed2",
+  "device": "cuda"
+}
