@@ -110,7 +110,7 @@ res_b[["exp_id", "backbone", "weight_tag", "params_m", "gmacs", "val_macro_f1", 
 ''')
 md("## Bước 2 — Công thức huấn luyện (backbone chọn từ Bước 1)")
 code('''
-BEST_BACKBONE = "resnet50"   # TODO: đổi theo kết quả Bước 1 (dựa trên val)
+BEST_BACKBONE = "convnext_tiny"   # B03: macro-F1 val cao nhất ở Bước 1
 BASE = {**COMMON, "backbone": BEST_BACKBONE}
 res_t = E.run_group(E.training_experiments(), BASE, seed=0)
 t00 = res_t.set_index("exp_id").loc["T00", "val_macro_f1"]
@@ -158,15 +158,22 @@ pd.DataFrame(lat)[["config", "gpu", "dtype", "batch", "fused_bn", "k_views", "p5
 md("## Bước 4 — Chung kết: ≥ 3 seed, test đúng một lần mỗi seed\n"
    "Chỉ chạy sau khi chốt cấu hình trên **val**. Không quay lại sửa sau khi đã xem test.")
 code('''
-FINAL = {"backbone": BEST_BACKBONE, "tag": "final"}   # TODO: gộp yếu tố tốt nhất ở Bước 2, vd {"mix": "cutmix", "loss": "ls", "ema_decay": 0.998}
-for seed in (0, 1, 2):
-    E.run_group({"F01": FINAL}, COMMON, seed=seed, save_test_predictions=True)
-    E.run_group({"T00": {"backbone": BEST_BACKBONE, "tag": "baseline"}}, COMMON, seed=seed, save_test_predictions=True)
+# Thử tổ hợp tốt nhất của Bước 2 trên VAL (T16 = TrivialAugment + EMA 0.998), seed 0
+res_c = E.run_group(E.training_experiments(["T16"]), BASE, seed=0)
+res_c[["exp_id", "overrides", "val_macro_f1", "val_top1"]]
+''')
+code('''
+# Chốt cấu hình trên val rồi chạy chung kết: F01 = T16 + test ở 288 + temperature scaling (T khớp trên val),
+# mốc T00 + I00; 3 seed; test mở đúng một lần cho mỗi seed.
+import final
+FINAL = {"backbone": BEST_BACKBONE, "aug": "trivial", "ema_decay": 0.998}
+final_rows = final.run_final(COMMON, FINAL, seeds=(0, 1, 2), res=288, exp_id="F01")
+pd.DataFrame(final_rows)
 ''')
 code('''
 for tag in ("F01", "T00"):
     !python {REPO_DIR}/eval.py score --pred "{WORK}/predictions/{tag}_seed*_test.csv" --test-csv {LABELS_DIR}/test_subset0.csv --labels {LABELS_DIR}/labels.csv --tag {tag} --out {WORK}/eval_out
-!python {REPO_DIR}/eval.py grade --final "{WORK}/predictions/F01_seed*_test.csv" --baseline "{WORK}/predictions/T00_seed*_test.csv" --test-csv {LABELS_DIR}/test_subset0.csv --labels {LABELS_DIR}/labels.csv --out {WORK}/eval_out
+!python {REPO_DIR}/eval.py grade --final "{WORK}/predictions/F01_seed*_test.csv" --baseline "{WORK}/predictions/T00_seed*_test.csv" --test-csv {LABELS_DIR}/test_subset0.csv --labels {LABELS_DIR}/labels.csv --uncal "{WORK}/predictions/F01uncal_seed*_test.csv" --final-val "{WORK}/predictions/F01_seed*_val.csv" --out {WORK}/eval_out
 ''')
 md("## Bước 5 — Sản phẩm\n`curves/`, `predictions/`, `runs/` đã nằm trong `WORK` trên Drive. "
    "Tải về và chép vào `submissions/<mssv>/`; dựng `results.xlsx` từ `runs/*/seed*/summary.json`.")

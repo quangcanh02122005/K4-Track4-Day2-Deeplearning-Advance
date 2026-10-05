@@ -38,6 +38,8 @@ TRAINING = {
     "T13": ("F", "EMA 0.998", {"ema_decay": 0.998}),
     "T14": ("G", "độ phân giải 256", {"img_size": 256}),
     "T15": ("G", "20 epoch", {"epochs": 20}),
+    # Tổ hợp (khác T00 hai yếu tố, có chủ đích): TrivialAugment (T04) + EMA (T13), kiểm tra cộng dồn
+    "T16": ("combo", "TrivialAugment + EMA 0.998", {"aug": "trivial", "ema_decay": 0.998}),
 }
 
 
