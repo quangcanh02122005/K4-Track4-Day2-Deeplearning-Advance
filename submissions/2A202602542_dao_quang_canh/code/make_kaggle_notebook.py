@@ -19,7 +19,7 @@ def code(s):
 
 md("# Lab Day 2 — Bước 4 trên Kaggle (F01 ×3 seed + mốc T00)\n"
    "Colab hết hạn mức GPU nên phần còn lại của Bước 4 chạy ở đây. Bước 1–3 đã xong ở Colab.\n"
-   "Cần bật **GPU T4** và **Internet**, và gắn Dataset chứa `best.pt` của T00 seed 0 (Add Input).")
+   "Cần bật **GPU T4** và **Internet**. Dataset chứa `best.pt` của T00 seed 0 là tùy chọn.")
 code('''
 !pip -q install timm
 import os, sys, glob, platform
@@ -35,8 +35,9 @@ import numpy as np, pandas as pd, torch, timm
 print("python", platform.python_version(), "| torch", torch.__version__, "| timm", timm.__version__)
 print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "KHÔNG CÓ GPU")
 ckpts = glob.glob("/kaggle/input/**/best.pt", recursive=True)
-print("checkpoint T00 seed 0:", ckpts)
-assert ckpts, "Chưa gắn Dataset chứa best.pt của T00 seed 0 (Add Input)"
+print("checkpoint T00 seed 0 (tùy chọn):", ckpts)
+# Có checkpoint từ Colab thì dùng lại cho T00 seed 0; không có thì train T00 seed 0 ngay tại đây (cùng phần cứng với F01).
+BASELINE_SEEDS = (1, 2) if ckpts else (0, 1, 2)
 ''')
 md("### Tải dữ liệu (MD5 phải khớp)")
 code('''
@@ -66,14 +67,15 @@ md("### Chung kết: F01 (TrivialAugment + EMA 0.998, test ở 288 + temperature
 code('''
 import final
 FINAL = {"backbone": "convnext_tiny", "aug": "trivial", "ema_decay": 0.998}
-final_rows = final.run_final(COMMON, FINAL, seeds=(0, 1, 2), res=288, exp_id="F01", baseline_seeds=(1, 2))
+final_rows = final.run_final(COMMON, FINAL, seeds=(0, 1, 2), res=288, exp_id="F01", baseline_seeds=BASELINE_SEEDS)
 pd.DataFrame(final_rows)
 ''')
-md("### Mốc T00 seed 0: dùng đúng checkpoint đã train ở Colab, chỉ ghi dự đoán val/test")
+md("### Mốc T00 seed 0: nếu có checkpoint từ Colab thì chỉ ghi dự đoán val/test (không thì đã train ở ô trên)")
 code('''
 from train import Config
-cfg0 = Config(**{**COMMON, "backbone": "convnext_tiny", "exp_id": "T00", "seed": 0, "tag": "baseline"})
-final.write_baseline_predictions(cfg0, ckpts[0])
+if ckpts:
+    cfg0 = Config(**{**COMMON, "backbone": "convnext_tiny", "exp_id": "T00", "seed": 0, "tag": "baseline"})
+    final.write_baseline_predictions(cfg0, ckpts[0])
 ''')
 md("### Chấm bằng eval.py")
 code('''
