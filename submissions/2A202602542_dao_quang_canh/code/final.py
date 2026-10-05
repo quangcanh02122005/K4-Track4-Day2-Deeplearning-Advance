@@ -98,6 +98,8 @@ def run_final(base: dict, final_overrides: dict, seeds=(0, 1, 2), res: int = 288
               baseline_seeds=None):
     """Với mỗi seed: huấn luyện cấu hình cuối (KHÔNG ghi test trong run), ghi dự đoán chung kết ở `res` + T;
     rồi chạy mốc T00 (công thức nền, 1 view 224) có ghi test. Trả về list dict tóm tắt."""
+    backbone = {**base, **final_overrides}.get("backbone")
+    assert backbone, "Phải chỉ rõ backbone (trong base hoặc final_overrides); mốc T00 dùng cùng backbone với chung kết"
     rows = []
     for seed in seeds:
         cfg = Config(**{**base, **final_overrides, "exp_id": exp_id, "seed": seed, "tag": "final",
@@ -106,6 +108,15 @@ def run_final(base: dict, final_overrides: dict, seeds=(0, 1, 2), res: int = 288
         info = write_final_predictions(cfg, res)
         rows.append(info)
     for seed in (seeds if baseline_seeds is None else baseline_seeds):
-        cfg0 = Config(**{**base, "exp_id": "T00", "seed": seed, "tag": "baseline", "save_test_predictions": True})
+        cfg0 = Config(**{**base, "backbone": backbone, "exp_id": "T00", "seed": seed, "tag": "baseline",
+                         "save_test_predictions": True})
         run(cfg0)
     return rows
+
+
+def run_baseline(base: dict, backbone: str, seeds=(0, 1, 2)):
+    """Chỉ chạy mốc T00 (công thức nền) cho `backbone`, mỗi seed, có ghi dự đoán test (1 view 224)."""
+    for seed in seeds:
+        cfg0 = Config(**{**base, "backbone": backbone, "exp_id": "T00", "seed": seed, "tag": "baseline",
+                         "save_test_predictions": True})
+        run(cfg0)
